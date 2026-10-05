@@ -37,19 +37,29 @@ def assignment(wtok, variables):
 def expression(wtok, variables):
     """ See syntax chart for expression"""
     result = term(wtok, variables)
-    while wtok.get_current() == '+':
-        wtok.next()
-        result = result + term(wtok, variables)
+    while wtok.get_current() == '+' or wtok.get_current() == '-':
+        if wtok.get_current() == '+':
+            wtok.next()
+            result = result + term(wtok, variables)
+        else: #handles subtraction. Doesnt handle unary minus though! 
+            wtok.next()
+            result = result - term(wtok, variables)
     return result
 
 
 def term(wtok, variables):
     """ See syntax chart for term"""
     result = factor(wtok, variables)
-    while wtok.get_current() == '*': 
-        wtok.next()
-        result = result * factor(wtok, variables)
+    while wtok.get_current() == '*' or wtok.get_current() == '/': 
+        if wtok.get_current() == '*':
+            wtok.next()
+            result = result * factor(wtok, variables)
+        else:
+            wtok.next()
+            result = result /factor(wtok, variables)
     return result
+
+
 
 
 def factor(wtok, variables):

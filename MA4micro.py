@@ -11,11 +11,23 @@ expressions.
 
 from MA4tokenizer import TokenizeWrapper
 
-def expression(wtok):
+'''def expression(wtok):
     result = term(wtok)
     while wtok.get_current() == '+':
         wtok.next()
         result = result + term(wtok)
+    return result'''
+
+def expression(wtok, variables):
+    """ See syntax chart for expression"""
+    result = term(wtok, variables)
+    while wtok.get_current() == '+' or wtok.get_current() == '-':
+        if wtok.get_current == '+':
+            wtok.next()
+            result = result + term(wtok, variables)
+        else:
+            wtok.next()
+            result = result - term(wtok, variables)
     return result
 
 def term(wtok):
