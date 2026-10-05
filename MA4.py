@@ -83,6 +83,13 @@ def factor(wtok, variables):
         wtok.next()
         result = -factor(wtok, variables)
 
+    elif wtok.is_name() == True:
+        if wtok.get_current() in variables:
+            result = variables[(wtok.get_current())]
+            wtok.next()
+        else:
+            raise CalculatorSyntaxError
+
     else:
         raise CalculatorSyntaxError(
             "Expected number, '(' or '-'") #slight mod with -  
@@ -127,6 +134,9 @@ def main():
         else:
             try:
                 result = statement(wtok, variables)
+                variables['ans'] = result ##implementation of ex3.
+                variables['PI'] = math.pi #exc4
+                variables['E'] = math.e #exc4
                 print('Result:', result)
 
             except CalculatorSyntaxError as se:
