@@ -25,6 +25,10 @@ class CalculatorSyntaxError(Exception):
 def statement(wtok, variables):
     """ See syntax chart for statement"""
     result = assignment(wtok, variables)
+    #needs to check if we are at EOL
+    #use built in function from the wrapper
+    if wtok.is_at_end() == False:
+        raise CalculatorSyntaxError ('Expected EOL')
     return result
 
 
@@ -70,15 +74,18 @@ def factor(wtok, variables):
         if wtok.get_current() != ')':
             raise CalculatorSyntaxError("Expected ')'")
         else:
-            wtok.next()
-            
+            wtok.next()          
     elif wtok.is_number():
         result = float(wtok.get_current())
         wtok.next()
 
+    elif wtok.get_current() == '-': ## unary minus?
+        wtok.next()
+        result = -factor(wtok, variables)
+
     else:
         raise CalculatorSyntaxError(
-            "Expected number or '('")  
+            "Expected number, '(' or '-'") #slight mod with -  
     return result
 
 
