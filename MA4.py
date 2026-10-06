@@ -34,10 +34,10 @@ def fib(n): #from MA1
     return _fib(n)
 
 def to_int(x):
-    if x.is_integer():
-        raise ValueError (f'Expected an int argument, but got {x}.') 
+    if x.is_integer() == False:
+        raise ValueError #(f'Expected an int argument, but got {x}.') 
     if x < 0:
-        raise ValueError (f'Expected a non-negative argument got {x}.')
+        raise ValueError #(f'Expected a non-negative argument got {x}.')
     return int(x)
 
 def fac_wrapper(x):
@@ -51,8 +51,9 @@ function_1 = {}
 function_1['sin'] = math.sin
 function_1['cos'] = math.cos 
 function_1['exp'] = math.exp
-function_1['log_10'] = math.log10 
-function_1['log_e'] = math.log
+#function_1['log_10'] = math.log10 
+#function_1['log_e'] = math.log
+function_1['log'] = math.log
 function_1['fac'] = fac_wrapper
 function_1['fib'] = fib_wrapper
 
@@ -60,9 +61,17 @@ function_1['fib'] = fib_wrapper
 
 def statement(wtok, variables):
     """ See syntax chart for statement"""
-    result = assignment(wtok, variables)
+    ### result = assignment(wtok, variables) #hastaged out in exc9
     #needs to check if we are at EOL
     #use built in function from the wrapper
+
+    ##ex9 error handling
+    try:
+        result = assignment(wtok, variables)
+    except ZeroDivisionError:
+        raise EvaluationError ('Division by zero!')
+
+    ##finished, below is another exc
     if wtok.is_at_end() == False:
         raise CalculatorSyntaxError (
             f'Expected an operator or EOL.')
@@ -120,8 +129,6 @@ def term(wtok, variables):
     return result
 
 
-
-
 def factor(wtok, variables):
     """ See syntax chart for factor"""
 
@@ -153,13 +160,13 @@ def factor(wtok, variables):
                     try:
                         result = function_1[function_name](arg)
                     except ValueError: #handles case like log(-10) which gives a better error msg
-                        raise CalculatorSyntaxError(f"Invalid argument to {function_name}")
+                        raise EvaluationError(f"Invalid argument to {function_name}.")
                 else:
                     raise CalculatorSyntaxError ("Excpected ')' after function input") 
             else:
                 raise CalculatorSyntaxError ('Expected "(" after a function call')
         else:
-            raise CalculatorSyntaxError ('The given function or variable is not defined!')
+            raise EvaluationError (f'Undefined variable or function {wtok.get_current()}')
 
     else:
         raise CalculatorSyntaxError(
@@ -221,9 +228,7 @@ def main():
                 f"Error occurred at '{wtok.get_current()}' just after '{wtok.get_previous()}'")
 
             except EvaluationError as ee:
-                print("*** Syntax error: ", ee)
-                print(
-                f"Error occurred at '{wtok.get_previous()}', which dosnet take '{wtok.get_current}' as an argument!")
+                print("*** Evaluation error: ", ee)
 
             except TokenError as te:
                 print('*** Syntax error: Unbalanced parentheses')
