@@ -142,6 +142,11 @@ def main():
         if wtok.get_current() == 'quit':
             print('Bye')
             exit()
+
+        if wtok.get_current() == 'vars': ##exc 7 
+            for item in variables:
+                print (f'{item} = {variables[item]}')
+        
         else:
             try:
                 result = statement(wtok, variables)
