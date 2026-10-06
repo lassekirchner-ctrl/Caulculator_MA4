@@ -17,6 +17,38 @@ import math
 from tokenize import TokenError  
 from MA4tokenizer import TokenizeWrapper
 
+##exc8 
+memory = {0:0, 1:1}
+def fib(n): #from MA1
+    def _fib(n):
+        if n not in memory:
+            memory[n] = _fib(n-1) + _fib(n-2)
+        return memory[n]
+    return _fib(n)
+
+def to_int(x):
+    if type(x) != float:
+        raise CalculatorSyntaxError (f'Expected an int argument, but got {x}') 
+    if x < 0:
+        raise CalculatorSyntaxError (f'Expected a non-negative argument')
+    return int(x)
+
+def fac_wrapper(x):
+    return math.factorial(to_int(x))
+
+def fib_wrapper(x):
+    return fib(to_int(x))
+
+##exc 8 
+function_1 = {}
+function_1['sin'] = math.sin
+function_1['cos'] = math.cos 
+function_1['exp'] = math.exp
+function_1['log'] = math.log
+function_1['fac'] = fac_wrapper
+function_1['fib'] = fib_wrapper
+
+
 
 class CalculatorSyntaxError(Exception):
     pass
@@ -79,6 +111,7 @@ def term(wtok, variables):
 
 def factor(wtok, variables):
     """ See syntax chart for factor"""
+
     if wtok.get_current() == '(':
         wtok.next()
         result = assignment(wtok, variables)
