@@ -196,6 +196,16 @@ def factor(wtok, variables):
                     raise CalculatorSyntaxError ("Excpected ')' after function input") 
             else:
                 raise CalculatorSyntaxError ('Expected "(" after a function call')
+
+        #also modded in exc10 
+        elif wtok.get_current() in function_n:
+                function_name = wtok.get_current()
+                wtok.next()    
+                arguments = arglist(wtok, variables) #eats both paranthesies
+                try:
+                    result = function_n[function_name](arguments)
+                except:
+                    raise ValueError
         else:
             raise EvaluationError (f'Undefined variable or function {wtok.get_current()}')
 
