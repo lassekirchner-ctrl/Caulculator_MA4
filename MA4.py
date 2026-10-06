@@ -17,6 +17,13 @@ import math
 from tokenize import TokenError  
 from MA4tokenizer import TokenizeWrapper
 
+
+class CalculatorSyntaxError(Exception):
+    pass
+
+class EvaluationError(Exception):
+    pass 
+
 ##exc8 
 memory = {0:0, 1:1}
 def fib(n): #from MA1
@@ -27,10 +34,10 @@ def fib(n): #from MA1
     return _fib(n)
 
 def to_int(x):
-    if type(x) != float:
-        raise CalculatorSyntaxError (f'Expected an int argument, but got {x}') 
+    if x.is_integer():
+        raise ValueError (f'Expected an int argument, but got {x}.') 
     if x < 0:
-        raise CalculatorSyntaxError (f'Expected a non-negative argument')
+        raise ValueError (f'Expected a non-negative argument got {x}.')
     return int(x)
 
 def fac_wrapper(x):
@@ -44,14 +51,11 @@ function_1 = {}
 function_1['sin'] = math.sin
 function_1['cos'] = math.cos 
 function_1['exp'] = math.exp
-function_1['log_10'] = math.log10 ##assue log 10
+function_1['log_10'] = math.log10 
 function_1['log_e'] = math.log
 function_1['fac'] = fac_wrapper
 function_1['fib'] = fib_wrapper
 
-
-class CalculatorSyntaxError(Exception):
-    pass
 
 
 def statement(wtok, variables):
@@ -60,7 +64,8 @@ def statement(wtok, variables):
     #needs to check if we are at EOL
     #use built in function from the wrapper
     if wtok.is_at_end() == False:
-        raise CalculatorSyntaxError ('Expected EOL')
+        raise CalculatorSyntaxError (
+            f'Expected an operator or EOL.')
     return result
 
 
@@ -83,7 +88,15 @@ def assignment(wtok, variables):
 
 def expression(wtok, variables):
     """ See syntax chart for expression"""
-    result = term(wtok, variables)
+    trigger = False
+    if wtok.get_current() == '-':
+        wtok.next()
+        trigger = True 
+
+    result = term(wtok, variables)    
+    if trigger == True:
+        result = -result 
+
     while wtok.get_current() == '+' or wtok.get_current() == '-':
         if wtok.get_current() == '+':
             wtok.next()
@@ -123,10 +136,6 @@ def factor(wtok, variables):
         result = float(wtok.get_current())
         wtok.next()
 
-    elif wtok.get_current() == '-': ## unary minus?
-        wtok.next()
-        result = -factor(wtok, variables)
-
     elif wtok.is_name() == True: #ex3 ##modified in ex 8
         if wtok.get_current() in variables:
             result = variables[(wtok.get_current())]
@@ -154,7 +163,7 @@ def factor(wtok, variables):
 
     else:
         raise CalculatorSyntaxError(
-            "Expected number, '(' or '-'") #slight mod with -  
+            "Expected number, function name or '('") 
     return result
 
 
@@ -210,6 +219,11 @@ def main():
                 print("*** Syntax error: ", se)
                 print(
                 f"Error occurred at '{wtok.get_current()}' just after '{wtok.get_previous()}'")
+
+            except EvaluationError as ee:
+                print("*** Syntax error: ", ee)
+                print(
+                f"Error occurred at '{wtok.get_previous()}', which dosnet take '{wtok.get_current}' as an argument!")
 
             except TokenError as te:
                 print('*** Syntax error: Unbalanced parentheses')
