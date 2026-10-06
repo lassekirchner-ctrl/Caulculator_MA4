@@ -35,6 +35,17 @@ def statement(wtok, variables):
 def assignment(wtok, variables):
     """ See syntax chart for assignment"""
     result = expression(wtok, variables)
+
+    ##note: while allows chained expressions like 10 = X = Y 
+    while wtok.get_current() == '=': #exc 5 and 6 
+        wtok.next()
+        if wtok.is_name():
+            name = wtok.get_current()
+            wtok.next()
+            variables[name] = result #adds to variables
+        else:
+            raise CalculatorSyntaxError ('Expected a variable name after "=" according to left to right assignment')
+
     return result
 
 
@@ -83,7 +94,7 @@ def factor(wtok, variables):
         wtok.next()
         result = -factor(wtok, variables)
 
-    elif wtok.is_name() == True:
+    elif wtok.is_name() == True: #ex3
         if wtok.get_current() in variables:
             result = variables[(wtok.get_current())]
             wtok.next()
