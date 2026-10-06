@@ -113,7 +113,41 @@ class Test(unittest.TestCase):
                 result = statement(wtok, variables)
             print('Got it')
 
+    #test for exc10
+    def test_many_arguments(self):
+        print('\n\nTesting functions with several arguments')
+        variables = variables_init
 
+        tests = {'max(1,5,3)': 5.,
+                 'min(4,2,8)': 2.,
+                 'sum(1,2,3,4)': 10.,
+                 'mean(2,4,6)': 4.,
+                 'max(7)': 7.,
+                 'max(1+1, 2*3, 4)': 6.,
+                 'sum(1,2,3)=x': 6.,
+                 'max(x, 2)': 6.,
+                 'mean(1, 2)': 1.5,
+                 'sum(max(1,2), min(3,4), 5)': 10.
+                 }
+        for line, answer in tests.items():
+            print(f'{line:30s} expects {answer:-8}', end='\t')
+            wtok = TokenizeWrapper(line)
+            result = statement(wtok, variables)
+            print(f'got {result:-8}')
+            self.assertAlmostEqual(result, answer)
+
+        print('Test that arglist returns a list of evaluated expressions')
+        wtok = TokenizeWrapper('(1+3,2,3*4)')
+        self.assertEqual(arglist(wtok, {}), [4, 2, 12])
+
+        tests = ['max(1,,2)', 'max(1 2)', 'sum(1,2']
+        for line in tests:
+            print(f'{line:30s} expects CalculatorSyntaxError', end=' \t \t ')
+            wtok = TokenizeWrapper(line)
+            with self.assertRaises((CalculatorSyntaxError, TokenError)):
+                statement(wtok, variables)
+            print('Got it')
+        
 if __name__ == "__main__":
     print('\n\nThe testcode initializes variables to\n', variables_init)
     unittest.main()

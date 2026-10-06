@@ -58,6 +58,37 @@ function_1['fac'] = fac_wrapper
 function_1['fib'] = fib_wrapper
 
 
+##exc10
+def mean(args):
+    if len(args) == 0:
+        raise EvaluationError ("Mean of a list of zero constituents cannot be calculated.")
+    return sum(args)/len(args)
+
+
+def arglist(wtok, variables):
+    if wtok.get_current() == '(':
+        wtok.next()
+        args = [assignment(wtok, variables)]
+        while wtok.get_current() == ',':
+            wtok.next()
+            args.append(assignment(wtok, variables))
+        if wtok.get_current() == ')':
+            wtok.next()
+        else:
+            CalculatorSyntaxError ("Expected ',' or ')' in argument list")
+    else:
+        raise CalculatorSyntaxError
+
+    return args
+
+
+function_n = {}
+function_n['mean'] = mean
+function_n['sum'] = sum
+function_n['min'] = min
+function_n['max'] = max
+
+#exc 10 above 
 
 def statement(wtok, variables):
     """ See syntax chart for statement"""
@@ -237,3 +268,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+print('remember to remove test from test.py')
