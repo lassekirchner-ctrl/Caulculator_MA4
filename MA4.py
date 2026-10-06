@@ -44,10 +44,10 @@ function_1 = {}
 function_1['sin'] = math.sin
 function_1['cos'] = math.cos 
 function_1['exp'] = math.exp
-function_1['log'] = math.log
+function_1['log_10'] = math.log10 ##assue log 10
+function_1['log_e'] = math.log
 function_1['fac'] = fac_wrapper
 function_1['fib'] = fib_wrapper
-
 
 
 class CalculatorSyntaxError(Exception):
@@ -127,12 +127,30 @@ def factor(wtok, variables):
         wtok.next()
         result = -factor(wtok, variables)
 
-    elif wtok.is_name() == True: #ex3
+    elif wtok.is_name() == True: #ex3 ##modified in ex 8
         if wtok.get_current() in variables:
             result = variables[(wtok.get_current())]
             wtok.next()
+
+        ##exc 8 mods
+        elif wtok.get_current() in function_1:
+            function_name = wtok.get_current()
+            wtok.next()
+            if wtok.get_current() == '(':
+                wtok.next()
+                arg = assignment(wtok, variables)
+                if wtok.get_current() == ')':
+                    wtok.next()
+                    try:
+                        result = function_1[function_name](arg)
+                    except ValueError: #handles case like log(-10) which gives a better error msg
+                        raise CalculatorSyntaxError(f"Invalid argument to {function_name}")
+                else:
+                    raise CalculatorSyntaxError ("Excpected ')' after function input") 
+            else:
+                raise CalculatorSyntaxError ('Expected "(" after a function call')
         else:
-            raise CalculatorSyntaxError
+            raise CalculatorSyntaxError ('The given function or variable is not defined!')
 
     else:
         raise CalculatorSyntaxError(
